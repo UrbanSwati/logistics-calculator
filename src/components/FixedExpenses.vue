@@ -11,7 +11,7 @@
         </form>
                 <div class="input-group mb-3" style="padding-top: 15px;">
                 <span class="input-group-text">R</span>
-                <input type="text" class="form-control" :value="totalExpenses" aria-label="Amount (to the nearest ZAR)" disabled>
+                <input type="number" class="form-control" v-model="totalFixedExpenses" aria-label="Amount (to the nearest ZAR)" disabled>
             </div>
         </div>    
 
@@ -22,7 +22,7 @@ import { useRoundTripStore } from "../stores/roundTrip";
 import { storeToRefs } from 'pinia';
 
 const roundTripStore = useRoundTripStore();
-const { expenses, totalExpenses } = storeToRefs(roundTripStore)
+const { expenses, totalFixedExpenses } = storeToRefs(roundTripStore)
 
 const addNewExpense = () => {
     expenses.value.push({ description: '', amount: 0 });
