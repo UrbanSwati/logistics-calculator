@@ -1,0 +1,87 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Serverless website on S3
+
+Parameters:
+  CustomDomainName:
+    Type: String
+    Description: Enter the custom domain name for the website e.g
+  CertificateArn:
+    Type: String
+    Description: ARN of the SSL certificate for the custom domain name. ONLY certs in us-east-1 because cloud flare only uses us-east-1
+  HostedZoneId:
+    Type: String
+    Description: Hosted zone ID
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref CustomDomainName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases: 
+          - !Ref CustomDomainName
+        Origins:
+          - Id: !Sub "${CustomDomainName}.s3-website.${AWS::Region}.amazonaws.com"
+            DomainName: !Sub "${CustomDomainName}.s3-website.${AWS::Region}.amazonaws.com"
+            CustomOriginConfig:
+              OriginProtocolPolicy: http-only
+              HTTPPort: 80
+              HTTPSPort: 443
+        Enabled: true
+        CNAMEs:
+          - !Ref CustomDomainName
+        DefaultRootObject: index.html
+        HttpVersion: http2
+        DefaultCacheBehavior:
+          Compress: true
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          CachePolicyId: 08627262-05a9-4f76-9ded-b50ca2e3a84f # Elemental-MediaPackage Managed Polciy ID
+          TargetOriginId: !Sub "${CustomDomainName}.s3-website.${AWS::Region}.amazonaws.com"
+          ViewerProtocolPolicy: redirect-to-https
+          ForwardedValues:
+            QueryString: false
+        ViewerCertificate:
+          AcmCertificateArn: !Ref CertificateArn
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2021
+
+  CloudFrontDNSRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Comment: !Sub "CloudFront Distribution managed by Stack: ${AWS::StackName}"
+      Name: !Ref CustomDomainName
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt CloudFrontDistribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2 # CloudFront default distribution zone ID
+
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+      # Restricting access to cloudfront only.
+        Statement:
+          - Effect: Allow
+            Action: 's3:GetObject'
+            Resource:
+              - !Sub "arn:aws:s3:::${S3Bucket}/*"
+            Principal: "*"
