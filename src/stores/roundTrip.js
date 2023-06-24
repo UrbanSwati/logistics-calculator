@@ -27,7 +27,7 @@ export const useRoundTripStore = defineStore({
       return (state.dryDistance / 100) * state.dryFuelConsumption * state.fuelPrice;
     },
     wetFuelCosts: (state) => {
-      return (state.wetDistance / 100) * state.dryFuelConsumption * state.fuelPrice;
+      return (state.wetDistance / 100) * state.wetFuelConsumption * state.fuelPrice;
     },
     totalFuelCosts: (state) => {
       return state.wetFuelCosts + state.dryFuelCosts;
