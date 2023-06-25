@@ -9,12 +9,16 @@
         </div>
             <button type="button" @click="addNewExpense" class="btn btn-outline-primary form-control">Add Expense</button>
         </form>
-                <div class="input-group mb-3" style="padding-top: 15px;">
-                <span class="input-group-text">R</span>
-                <input type="number" class="form-control" v-model="totalFixedExpenses" aria-label="Amount (to the nearest ZAR)" disabled>
-            </div>
+                
+        <div class="mb-3" style="padding-top: 12px;">
+        <label for="basic-url" class="form-label">Total fixed expenses</label>
+        <div class="input-group">
+            <span class="input-group-text" id="basic-addon3">R</span>
+            <input type="number" class="form-control" v-model="totalFixedExpenses" aria-describedby="basic-addon3 basic-addon4" disabled>
+        </div>
+        <div class="form-text" id="basic-addon4">Expenses can be toll gates and other things required on each load</div>
         </div>    
-
+        </div>
 </template>
 
 <script setup>

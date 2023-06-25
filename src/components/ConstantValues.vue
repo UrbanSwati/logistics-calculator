@@ -33,9 +33,8 @@
         <div class="mb-3">
         <label for="basic-url" class="form-label">Tons per load</label>
         <div class="input-group">
-            <span class="input-group-text" id="basic-addon3">R</span>
             <input type="number" class="form-control" v-model="tonsPerLoad" aria-describedby="basic-addon3 basic-addon4">
-            <span class="input-group-text">Ton</span>
+            <span class="input-group-text">Tons</span>
         </div>
         <div class="form-text" id="basic-addon4">Amount of tons the vehicle can carry per load</div>
         </div>
